@@ -197,9 +197,8 @@ install_node(){
 	clear
 	echo
 	echo "#############################################################"
-	echo "# One click Install Shadowsocks-Python-Manyuser             #"
-	echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu   #"
-	echo "# Author: 91vps                                             #"
+	echo "# 节点安装             #"
+	echo "# Author: sms                                             #"
 	echo "#############################################################"
 	echo
 	#Check Root
@@ -263,8 +262,7 @@ install_node(){
 	chmod +x /etc/rc.d/rc.local
 	echo "#############################################################"
 	echo "# 安装完成，节点即将重启使配置生效                          #"
-	echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu   #"
-	echo "# Author: 91vps                                             #"
+	echo "# Author: sms                                             #"
 	echo "#############################################################"
 	reboot now
 }
@@ -345,8 +343,7 @@ install_node_db(){
 	chmod +x /etc/rc.d/rc.local
 	echo "#############################################################"
 	echo "# 安装完成，节点即将重启使配置生效                          #"
-	echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu   #"
-	echo "# Author: 91vps                                             #"
+	echo "# Author: sms                                             #"
 	echo "#############################################################"
 	reboot now
 }
@@ -384,32 +381,28 @@ install_panel_and_node(){
 }
 echo
 echo "#############################################################"
-echo "# One click Install SS-panel and Shadowsocks-Py-Mu          #"
-echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu   #"
-echo "# Author: 91vps                                             #"
-echo "# Please choose the server you want                         #"
-echo "# 1  SS-V3_mod_panel and node One click Install             #"
-echo "# 2  SS-node modwebapi One click Install                    #"
-echo "# 3  SS-node Database  One click Install                    #"
+echo "# 节点安装          #"
+echo "# 节点安装   #"
+echo "# Author: sms                                             #"
 echo "#############################################################"
 echo
 num=$1
 if [ "${num}" == "1" ]; then
     install_panel_and_node 1
 else
-    stty erase '^H' && read -p " 请输入数字 [1-3]:" num
+    stty erase '^H' && read -p " 请输入数字 [1]:" num
 		case "$num" in
 		1)
-		install_panel_and_node
-		;;
-		2)
 		install_node
 		;;
+		2)
+		install_node1
+		;;
 		3)
-		install_node_db
+		install_node_db1
 		;;
 		*)
-		echo "请输入正确数字 [1-3]"
+		echo "请输入正确数字 [1]"
 		;;
 	esac
 fi
