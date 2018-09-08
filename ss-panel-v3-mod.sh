@@ -1,46 +1,6 @@
 #!/bin/bash
 #Check Root
 [ $(id -u) != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
-install_ss_panel_mod_v3(){
-	yum -y remove httpd
-	yum install -y unzip zip git
-	yum update -y nss curl libcurl 
-	num=$1
-	if [ "${num}" != "1" ]; then
-  	  wget -c --no-check-certificate https://raw.githubusercontent.com/mmmwhy/ss-panel-and-ss-py-mu/master/lnmp1.4.zip && unzip lnmp1.4.zip && rm -rf lnmp1.4.zip && cd lnmp1.4 && chmod +x install.sh && ./install.sh lnmp
-	fi
-	cd /home/wwwroot/
-	cp -r default/phpmyadmin/ .
-	cd default
-	rm -rf index.html
-	git clone https://github.com/mmmwhy/mod.git tmp && mv tmp/.git . && rm -rf tmp && git reset --hard
-	cp config/.config.php.example config/.config.php
-	chattr -i .user.ini
-	mv .user.ini public
-	chown -R root:root *
-	chmod -R 777 *
-	chown -R www:www storage
-	chattr +i public/.user.ini
-	wget -N -P  /usr/local/nginx/conf/ --no-check-certificate https://raw.githubusercontent.com/mmmwhy/ss-panel-and-ss-py-mu/master/nginx.conf
-	service nginx restart
-	IPAddress=`wget http://whatismyip.akamai.com/ -O - -q ; echo`;
-	sed -i "s#103.74.192.11#${IPAddress}#" /home/wwwroot/default/sql/sspanel.sql
-	mysql -uroot -proot -e"create database sspanel;" 
-	mysql -uroot -proot -e"use sspanel;" 
-	mysql -uroot -proot sspanel < /home/wwwroot/default/sql/sspanel.sql
-	cd /home/wwwroot/default
-	php -n xcat initdownload
-	php xcat initQQWry
-	yum -y install vixie-cron crontabs
-	rm -rf /var/spool/cron/root
-	echo 'SHELL=/bin/bash' >> /var/spool/cron/root
-	echo 'PATH=/sbin:/bin:/usr/sbin:/usr/bin' >> /var/spool/cron/root
-	echo '*/20 * * * * /usr/sbin/ntpdate pool.ntp.org > /dev/null 2>&1' >> /var/spool/cron/root
-	echo '30 22 * * * php /home/wwwroot/default/xcat sendDiaryMail' >> /var/spool/cron/root
-	echo '0 0 * * * php /home/wwwroot/default/xcat dailyjob' >> /var/spool/cron/root
-	echo '*/1 * * * * php /home/wwwroot/default/xcat checkjob' >> /var/spool/cron/root
-	/sbin/service crond restart
-}
 Libtest(){
 	#自动选择下载节点
 	GIT='raw.githubusercontent.com'
@@ -270,9 +230,7 @@ install_node_db(){
 	clear
 	echo
 	echo "#############################################################"
-	echo "# One click Install Shadowsocks-Python-Manyuser             #"
-	echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu   #"
-	echo "# Author: 91vps                                             #"
+	echo "# Author: sms                                             #"
 	echo "#############################################################"
 	echo
 	#Check Root
@@ -347,38 +305,6 @@ install_node_db(){
 	echo "#############################################################"
 	reboot now
 }
-install_panel_and_node(){
-	install_ss_panel_mod_v3 $1
-	# 取消文件数量限制
-	sed -i '$a * hard nofile 512000\n* soft nofile 512000' /etc/security/limits.conf
-	install_centos_ssr
-	wget -N -P  /root/shadowsocks/ --no-check-certificate  https://raw.githubusercontent.com/mmmwhy/ss-panel-and-ss-py-mu/master/userapiconfig.py
-	# 启用supervisord
-	echo_supervisord_conf > /etc/supervisord.conf
-  sed -i '$a [program:ssr]\ncommand = python /root/shadowsocks/server.py\nuser = root\nautostart = true\nautorestart = true' /etc/supervisord.conf
-	supervisord
-	#iptables
-	systemctl stop firewalld.service
-	systemctl disable firewalld.service
-	yum install iptables -y
-	iptables -F
-	iptables -X  
-	iptables -I INPUT -p tcp -m tcp --dport 22:65535 -j ACCEPT
-	iptables -I INPUT -p udp -m udp --dport 22:65535 -j ACCEPT
-	iptables-save >/etc/sysconfig/iptables
-	iptables-save >/etc/sysconfig/iptables
-	echo 'iptables-restore /etc/sysconfig/iptables' >> /etc/rc.local
-	echo "/usr/bin/supervisord -c /etc/supervisord.conf" >> /etc/rc.local
-	chmod +x /etc/rc.d/rc.local
-	echo "#############################################################"
-	echo "# 安装完成，登录http://${IPAddress}看看吧~                   #"
-	echo "# 用户名: 91vps 密码: 91vps                                  #"
-	echo "# phpmyadmin：http://${IPAddress}:888  用户名密码均为：root  #"
-	echo "# 安装完成，节点即将重启使配置生效                           #"
-	echo "# Github: https://github.com/mmmwhy/ss-panel-and-ss-py-mu    #"
-	echo "#############################################################"
-	reboot now
-}
 echo
 echo "#############################################################"
 echo "# 节点安装          #"
@@ -396,10 +322,10 @@ else
 		install_node
 		;;
 		2)
-		install_node1
+		install_node
 		;;
 		3)
-		install_node_db1
+		install_node
 		;;
 		*)
 		echo "请输入正确数字 [1]"
